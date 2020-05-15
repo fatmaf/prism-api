@@ -52,17 +52,20 @@ public class testMATHTS {
 	}
 
 	public void run() throws PrismException, IOException {
-		String dir = "../prism/tests/wkspace/tro_examples/";//"/home/fatma/Data/PhD/code/prism_ws/prism-svn/prism/tests/wkspace/simpleTests/";
+		System.out.println(System.getProperty("user.dir"));
+		String currentDir = System.getProperty("user.dir"); 
+		
+		String dir = currentDir+"/prism-api/tests/wkspace/tro_examples/";//"/home/fatma/Data/PhD/code/prism_ws/prism-svn/prism/tests/wkspace/simpleTests/";
 		// System.getProperty("user.dir");
 	
-		testsLocation = "../prism/tests/wkspace/tro_examples/";
+		testsLocation = currentDir+"/prism-api/tests/wkspace/tro_examples/";
 
 		resultsLocation = testsLocation+"/results/";
 		String example = "tro_example_new_small";
 		testSingleAgentLoader(testsLocation,example,resultsLocation);
 
 
-//		runGUISimpleTestsDebug1();
+		runGUISimpleTestsDebug1(testsLocation,testsLocation,resultsLocation,example);
 
 	}
 
@@ -296,14 +299,14 @@ public class testMATHTS {
 
 
 	
-	public void runGUISimpleTestsDebug1() throws IOException {
+	public void runGUISimpleTestsDebug1(String dir,String testsLocation,String resultsLocation,String example) throws IOException {
 		// saving filenames etc
-		String dir = "../prism/tests/wkspace/tro_examples/";//"/home/fatma/Data/PhD/code/prism_ws/prism-svn/prism/tests/wkspace/simpleTests/";
+//		String dir = "../prism/tests/wkspace/tro_examples/";//"/home/fatma/Data/PhD/code/prism_ws/prism-svn/prism/tests/wkspace/simpleTests/";
 		// System.getProperty("user.dir");
 	
-		testsLocation = "../prism/tests/wkspace/tro_examples/";
+//		testsLocation = "../prism/tests/wkspace/tro_examples/";
 
-		resultsLocation = testsLocation+"/results/";
+//		resultsLocation = testsLocation+"/results/";
 		HashMap<String, Boolean> example_has_door_list = new HashMap<String, Boolean>();
 		HashMap<String, Integer> example_num_door_list = new HashMap<String, Integer>();
 		HashMap<String, Integer> example_num_robot_list = new HashMap<String, Integer>();
@@ -316,7 +319,7 @@ public class testMATHTS {
 		int numFS = 0;
 		int numGoals = 3;
 		int numDoors = 1;
-		String example = "tro_example_new_small";
+//		String example = "tro_example_new_small";
 		
 		String example_id = example;
 
@@ -356,8 +359,8 @@ public class testMATHTS {
 								+ ((double) (testCount + 1) / (double) maxFiles)
 								+ ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
-//						doTHTS(dir + "results/thts", dir, example_to_run, r, g, example_num_door_list.get(example_id),
-//								example_num_fs_list.get(example_id));
+						doTHTS(dir + "results/thts", dir, example_to_run, r, g, example_num_door_list.get(example_id),
+								example_num_fs_list.get(example_id));
 
 						testCount++;
 						testsDone.add(example_id);
@@ -368,6 +371,7 @@ public class testMATHTS {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			System.out.println("Error: " + e.getMessage());
 			System.exit(1);
 		} 

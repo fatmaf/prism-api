@@ -23,6 +23,7 @@ import explicit.MDP;
 import explicit.MDPModelChecker;
 import explicit.ModelCheckerResult;
 import explicit.ProbModelChecker;
+import explicit.rewards.ConstructRewards;
 import explicit.rewards.MDPRewardsSimple;
 import explicit.LTLModelChecker.LTLProduct;
 import parser.State;
@@ -238,7 +239,10 @@ public class SingleAgentLoader {
 	
 		int rewStructIndex=prismModelGen.getRewardStructIndex((String)rewStructName);
 		pmc.setModelCheckingInfo(modelInfo, altPropertiesFile, (RewardGenerator)prismModelGen);
-		MDPRewardsSimple costsModel = (MDPRewardsSimple) pmc.constructRewards(prodbeforerew,(int)rewStructIndex);
+		ConstructRewards constructRewards = new ConstructRewards(pmc);
+		
+		MDPRewardsSimple costsModel = (MDPRewardsSimple)constructRewards.buildRewardStructure(prodbeforerew, (RewardGenerator)prismModelGen, rewStructIndex);
+	
 //		RewardStruct costStruct = (rewExpr).getRewardStructByIndexObject(modulesFile, modulesFile.getConstantValues());
 		
 		// commenting this out because its giving the error Error: Could not evaluate
