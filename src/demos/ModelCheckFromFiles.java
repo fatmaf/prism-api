@@ -69,11 +69,11 @@ public class ModelCheckFromFiles
 			prism.initialise();
 
 			// Parse and load a PRISM model from a file
-			ModulesFile modulesFile = prism.parseModelFile(new File("examples/dice.pm"));
+			ModulesFile modulesFile = prism.parseModelFile(new File("prism-api/examples/dice.pm"));
 			prism.loadPRISMModel(modulesFile);
 
 			// Parse and load a properties model for the model
-			PropertiesFile propertiesFile = prism.parsePropertiesFile(modulesFile, new File("examples/dice.pctl"));
+			PropertiesFile propertiesFile = prism.parsePropertiesFile(modulesFile, new File("prism-api/examples/dice.pctl"));
 
 			// Model check the first property from the file
 			System.out.println(propertiesFile.getPropertyObject(0));
