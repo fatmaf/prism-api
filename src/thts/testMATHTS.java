@@ -65,10 +65,11 @@ public class testMATHTS {
 		testSingleAgentLoader(testsLocation,example,resultsLocation);
 
 
-		runGUISimpleTestsDebug1(testsLocation,testsLocation,resultsLocation,example);
+//		runGUISimpleTestsDebug1(testsLocation,testsLocation,resultsLocation,example);
 
 	}
 
+	
 	public void testMAPMG(PrismLog mainLog, ArrayList<SingleAgentLoader> sals, DA<BitSet, ? extends AcceptanceOmega> da,
 			String saveplace, String fn) throws PrismException {
 		boolean buildMDP = true;

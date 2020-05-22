@@ -199,7 +199,7 @@ public class SingleAgentLoader {
 		// and then we go on
 		PropertiesFile altPropertiesFile = prism.parsePropertiesFile(modulesFile, new File(alternatepropfile));
 
-		mc.setModelCheckingInfo(modelInfo, altPropertiesFile, (RewardGenerator)prismModelGen);
+		mc.setModelCheckingInfo(modelInfo, altPropertiesFile, (RewardGenerator) prismModelGen);
 		// so lets find out how many properties there are
 		MDP oldproduct = null;
 
@@ -225,33 +225,61 @@ public class SingleAgentLoader {
 		}
 		ProbModelChecker pmc = new ProbModelChecker(prism);
 		oldproduct = mdp;
+		NestedProductMDP npMDP = new NestedProductMDP(mdp);
 		// so now we do the da stuff
 		for (Expression exprHere : otherExpressions) {
-			oldproduct = getProduct(oldproduct, exprHere,pmc);
+			npMDP.constructProductModel(exprHere, ltlMC, pmc, allowedAcceptance, resLoc);
 		}
-		oldproduct = getProduct(oldproduct, safetyExpr,pmc);
-		//product before 
-		MDP prodbeforerew = oldproduct;
-		oldproduct = getProduct(oldproduct, rewExpr,pmc);
-		//so I have the modelinfo and the rewstructure index 
-		//lets check this out 
-		 Object rewStructName = rewExpr.getRewardStructIndex();
-	
-		int rewStructIndex=prismModelGen.getRewardStructIndex((String)rewStructName);
-		pmc.setModelCheckingInfo(modelInfo, altPropertiesFile, (RewardGenerator)prismModelGen);
+		npMDP.constructProductModel(safetyExpr, ltlMC, pmc, allowedAcceptance, resLoc, true);
+//		oldproduct = getProduct(oldproduct, safetyExpr,pmc);
+		// product before
+//		MDP prodbeforerew = oldproduct;
+		npMDP.constructProductModel(rewExpr, ltlMC, pmc, allowedAcceptance, resLoc);
+//		oldproduct = getProduct(oldproduct, rewExpr,pmc);
+		// so I have the modelinfo and the rewstructure index
+		// lets check this out
+		Object rewStructName = rewExpr.getRewardStructIndex();
+
+		int rewStructIndex = prismModelGen.getRewardStructIndex((String) rewStructName);
+		pmc.setModelCheckingInfo(modelInfo, altPropertiesFile, (RewardGenerator) prismModelGen);
 		ConstructRewards constructRewards = new ConstructRewards(pmc);
-		
-		MDPRewardsSimple costsModel = (MDPRewardsSimple)constructRewards.buildRewardStructure(prodbeforerew, (RewardGenerator)prismModelGen, rewStructIndex);
-	
+
+		MDPRewardsSimple costsModel = (MDPRewardsSimple) constructRewards.buildRewardStructure(mdp,
+				(RewardGenerator) prismModelGen, rewStructIndex);
+
+		// map this costsModel to the actual MDP model
+		// lets do this
+		MDPRewardsSimple mappedRewards = npMDP.mapRewardsToCurrentProduct(costsModel);
+		MDPRewardsSimple taskProgRewards = npMDP.createTaskRewards();
+// 		computeNestedValIterArray(MDPModelChecker mc,MDP mdp, BitSet target, BitSet remain,
+// 		ArrayList<MDPRewardsSimple> rewards,
+// 				ArrayList<double[]> rewardsInitVal, 
+// 		ArrayList<Boolean> minRewards, BitSet statesToIgnoreForVI, int probPreference, 
+// 		double[] probInitVal,PrismLog mainLog)
+
+		MDPValIter vi = new MDPValIter();
+		ArrayList<Boolean> minrews = new ArrayList<Boolean>();
+		minrews.add(false);
+		minrews.add(true);
+		ArrayList<MDPRewardsSimple> rews = new ArrayList<MDPRewardsSimple>();
+		rews.add(taskProgRewards);
+		rews.add(mappedRewards);
+		npMDP.createTargetStates();
+		BitSet remain = npMDP.getRemainStates();
+		BitSet target = (BitSet) npMDP.acc.clone();
+		MDPModelChecker mdpmc = new MDPModelChecker(pmc);
+
+		vi.computeNestedValIterArray(mdpmc, npMDP.getProductModel(), target, remain, rews, null, minrews, null, 1, null,
+				this.mainLog);
+
 //		RewardStruct costStruct = (rewExpr).getRewardStructByIndexObject(modulesFile, modulesFile.getConstantValues());
-		
+
 		// commenting this out because its giving the error Error: Could not evaluate
 		// constant ("failstate", line 166, column 20).
 		// we know this is because I'm not intializing this properly cuz i'm lazy and
 		// prism code is confusing
 		// but its okay we can do this later
 
-	
 //		MDPRewardsSimple costsModel = (MDPRewardsSimple) pmc.constructRewards(prodbeforerew, costStruct);
 //		for (int i = 0; i < altPropertiesFile.getNumProperties(); i++) {
 //			System.out.println(altPropertiesFile.getProperty(i));
@@ -301,23 +329,28 @@ public class SingleAgentLoader {
 		return null;
 	}
 
-	MDP getProduct(MDP oldproduct, Expression exprHere,ProbModelChecker pmc ) throws PrismException {
-		Expression daExpr = ((ExpressionQuant) exprHere).getExpression();
-		Vector<BitSet> labelBS = new Vector<BitSet>();
-	
-
-		DA<BitSet, ? extends AcceptanceOmega> daHere = ltlMC.constructDAForLTLFormula(pmc, oldproduct, daExpr, labelBS,
-				allowedAcceptance);
-
-		LTLProduct<MDP> product = ltlMC.constructProductModel(daHere, oldproduct, labelBS, null);
-
-		BitSet daHereAccStates = daHere.getAccStates();
-		PrismLog out = new PrismFileLog(resLoc + "_" + exprHere.toString() + ".dot");
-		// printing the da
-		daHere.print(out, "dot");
-		out.close();
-		return product.getProductModel();
-	}
+//	MDP getProduct(NestedProductMDP npProduct, Expression exprHere,ProbModelChecker pmc ) throws PrismException {
+//		//so technically the things we want are kind of the nested structure 
+//		//i'd like to know the index for this expression 
+//		//the index of any other expressions and so on 
+//		
+//		
+//		Expression daExpr = ((ExpressionQuant) exprHere).getExpression();
+//		Vector<BitSet> labelBS = new Vector<BitSet>();
+//	
+//
+//		DA<BitSet, ? extends AcceptanceOmega> daHere = ltlMC.constructDAForLTLFormula(pmc, oldproduct, daExpr, labelBS,
+//				allowedAcceptance);
+//
+//		LTLProduct<MDP> product = ltlMC.constructProductModel(daHere, oldproduct, labelBS, null);
+//product.getAutomatonState(0);
+//		BitSet daHereAccStates = daHere.getAccStates();
+//		PrismLog out = new PrismFileLog(resLoc + "_" + exprHere.toString() + ".dot");
+//		// printing the da
+//		daHere.print(out, "dot");
+//		out.close();
+//		return product.getProductModel();
+//	}
 
 	public HashMap<Objectives, HashMap<State, Double>> solveUsingPartialSatisfaction()
 			throws PrismException, FileNotFoundException {
@@ -349,8 +382,7 @@ public class SingleAgentLoader {
 		mc.setGenStrat(true);
 		mc.setExportAdv(true);
 
-		
-		mc.setModelCheckingInfo(modelInfo, propertiesFile, (RewardGenerator)this.prismModelGen);
+		mc.setModelCheckingInfo(modelInfo, propertiesFile, (RewardGenerator) this.prismModelGen);
 		boolean exportAdv = true;
 		String savePlace = resLoc + agentLabel + "_partsat";
 
@@ -447,7 +479,7 @@ public class SingleAgentLoader {
 		da.print(out, "dot");
 		out.close();
 		prodModelGen = new ProductModelGenerator(prismModelGen, da, labelExprs);
-		prism.loadModelGenerator(prismModelGen);
+		prism.loadModelGenerator(prismModelGen); //should be loading the prod model gen no?
 		return da;
 
 	}
