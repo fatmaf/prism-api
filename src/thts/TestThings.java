@@ -187,6 +187,14 @@ public class TestThings {
 		{
 			State s = q.poll(); 
 			System.out.println(s);
+			//lets get its children ? 
+			nppgen.exploreState(s);
+			int choices = nppgen.getNumChoices();
+			for(int c = 0; c<choices; c++)
+			{
+				Object action = nppgen.getChoiceAction(c);
+				System.out.println(action);
+			}
 		}
 //		prodModelGen = new ProductModelGenerator(prismModelGen, da, labelExprs);
 //		prism.loadModelGenerator(prismModelGen);
