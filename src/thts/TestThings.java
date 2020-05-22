@@ -194,6 +194,12 @@ public class TestThings {
 			{
 				Object action = nppgen.getChoiceAction(c);
 				System.out.println(action);
+				int transitions = nppgen.getNumTransitions(c);
+				for(int t = 0; t<transitions; t++)
+				{
+					nppgen.getTransitionProbability(c, t); 
+					nppgen.computeTransitionTarget(c, t);
+				}
 			}
 		}
 //		prodModelGen = new ProductModelGenerator(prismModelGen, da, labelExprs);
