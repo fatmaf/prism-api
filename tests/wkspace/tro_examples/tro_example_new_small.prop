@@ -1,8 +1,8 @@
 //partial(R{"time"}min=? [ F "v0" ],Pmax=? [F "v4"] ,Pmax=?[G (!"v5")] )
-R{"time"}min=? [ F (s=0) ]
-//R{"time"}min=? [ F ("v0") ]
-Pmax=? [F (s=4)]
-//Pmax=? [F ("v4")]
-Pmax=?[G (!(s=5))]
-//Pmax=?[G (!("v5"))]
+//R{"time"}min=? [ F (s=0) ]
+R{"time"}min=? [ F ("v0") ]
+//Pmax=? [F (s=4)]
+Pmax=? [F ("v4")]
+//Pmax=?[G (!(s=5))]
+Pmax=?[G (!("v5"))]
 //labels dont seem to work
