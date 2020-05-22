@@ -197,8 +197,9 @@ public class TestThings {
 				int transitions = nppgen.getNumTransitions(c);
 				for(int t = 0; t<transitions; t++)
 				{
-					nppgen.getTransitionProbability(c, t); 
-					nppgen.computeTransitionTarget(c, t);
+					double prob = nppgen.getTransitionProbability(c, t); 
+					State ns = nppgen.computeTransitionTarget(c, t);
+					System.out.println(prob);
 				}
 			}
 		}
